@@ -2146,7 +2146,7 @@
   <div class="tab" data-tab="breath"><span>Breath 模拟</span><span class="tab-en">Breath Trace</span></div>
   <div class="tab" data-tab="network"><span>记忆网络</span><span class="tab-en">Network</span></div>
   <div class="tab" data-tab="plan"><span>计划</span><span class="tab-en">Plans</span></div>
-  <div class="tab" data-tab="letters"><span>信</span><span class="tab-en">Letters</span></div>
+  <div class="tab" data-tab="letters"><span>信与日记</span><span class="tab-en">Letters</span></div>
   <div class="tab" data-tab="anchors"><span>锚点</span><span class="tab-en">Anchors</span></div>
   <div class="tab" data-tab="import"><span>导入</span><span class="tab-en">Import</span></div>
   <div class="tab" data-tab="faq"><span>帮助</span><span class="tab-en">FAQ</span></div>
@@ -5613,7 +5613,7 @@ function _paintBuckets() {
     else if (b.dont_surface)   iconHtml = '<i data-lucide="eye-off"></i>';
     else if (b.pinned)       { iconHtml = '<i data-lucide="pin"></i>'; iconCls = 'icon pin-ic'; }
     else if (b.type === 'feel')   iconHtml = feelFace(b.valence, b.arousal);
-    else if (b.type === 'letter') iconHtml = '<i data-lucide="mail"></i>';
+    else if (b.type === 'letter') iconHtml = (b.tags || []).indexOf('__diary__') >= 0 ? '<i data-lucide="book-open"></i>' : '<i data-lucide="mail"></i>';
     else if (b.digested)     iconHtml = '<i data-lucide="leaf"></i>';
     else if (b.resolved)     iconHtml = '<i data-lucide="moon"></i>';
     else                     iconHtml = '<i data-lucide="message-circle"></i>';
@@ -10201,7 +10201,7 @@ function _renderLetter(l) {
     : (l.lock_type === 'permanent' ? '永久锁 · 当前不可查看' : '立即可读');
   return `<article style="background:var(--surface);border:1px solid var(--border);border-radius:2px;padding:18px 22px;box-shadow:4px 4px 10px var(--shadow-dark-subtle), -4px -4px 10px var(--shadow-light);" data-id="${escAttr(l.id)}">
     <div style="font-size:11px;color:var(--text-dim);letter-spacing:0.15em;display:flex;justify-content:space-between;margin-bottom:8px;">
-      <span style="color:${accentColor};font-weight:600;">${esc(who)}</span><span>${esc(l.date || '')}</span>
+      <span style="color:${accentColor};font-weight:600;">${esc(who)}${l.diary ? ' · 日记' : ''}</span><span>${esc(l.date || '')}</span>
     </div>
     <div style="font-size:11px;color:${l.locked ? 'var(--accent)' : 'var(--text-dim)'};margin-bottom:8px;">${lockLabel}</div>
     ${l.deletion_request && l.deletion_request.status === 'pending' ? `<div style="font-size:12px;color:var(--negative);margin-bottom:8px;">删除申请待决定 / Deletion pending: ${esc(l.deletion_request.human_reason || '')}</div>` : ''}

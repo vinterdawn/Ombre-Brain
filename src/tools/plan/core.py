@@ -184,6 +184,7 @@ def safe_letter_metadata(bucket: dict, caller_side: str | None) -> dict:
     if not state["locked"]:
         payload["title"] = meta.get("title", "") or meta.get("name", "")
         payload["content"] = strip_wikilinks(bucket.get("content", ""))
+        payload["diary"] = "__diary__" in (meta.get("tags") or [])
     return payload
 
 
