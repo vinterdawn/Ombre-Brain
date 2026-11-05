@@ -34,6 +34,7 @@ import logging
 import asyncio
 import time
 from contextlib import asynccontextmanager
+from datetime import datetime
 from typing import Optional, Awaitable
 import httpx
 
@@ -1251,6 +1252,56 @@ async def letter_read(
 
 
 @mcp.tool()
+async def diary_write(
+    content: str,
+    title: Optional[str] = "",
+    date: Optional[str] = "",
+    ai_name: Optional[str] = "",
+) -> str:
+    """写今天的日记。content=日记正文。日记是我写给自己的,不是写给谁的信:用「我」,写今天发生了什么、我怎么想。
+记忆里的事都是我做过的,不要写成「那个窗口的我」「上一个我」。
+
+原文永久保存,不压缩、不合并、不衰减。title 不填时自动用「日记 · 日期」;date 不填用今天;
+ai_name 是我的名字(署名用),不填则取环境变量 AI_NAME。
+读日记用 diary_read;日记底层存成我署名的信,所以 letter_read 也能看到它。"""
+    day = (date or "").strip() or datetime.now().strftime("%Y-%m-%d")
+    return await _with_notice(
+        _t_plan.letter_write(
+            author="ai", content=content,
+            title=(title or "").strip() or f"日记 · {day}",
+            date=day, ai_name=ai_name, kind="diary",
+        ),
+        op="diary_write",
+        args={
+            "content_len": len(content or ""), "title": title,
+            "date": date, "ai_name": ai_name,
+        },
+    )
+
+
+@mcp.tool()
+async def diary_read(
+    query: Optional[str] = "",
+    limit: Optional[int] = 10,
+    date_from: Optional[str] = "",
+    date_to: Optional[str] = "",
+) -> str:
+    """读我以前写的日记。无 query 时按时间倒序返回最近 limit 篇;query=语义检索;
+date_from/date_to=ISO 日期范围。返回完整原文,不压缩。只返回日记,不返回普通信件。"""
+    return await _with_notice(
+        _t_plan.letter_read(
+            query=query, limit=limit,
+            date_from=date_from, date_to=date_to, kind="diary",
+        ),
+        op="diary_read",
+        args={
+            "query": query, "limit": limit,
+            "date_from": date_from, "date_to": date_to,
+        },
+    )
+
+
+@mcp.tool()
 async def feel(
     query: str,
     max_tokens: Optional[int] = 0,
@@ -1319,6 +1370,8 @@ for _strict_tool_name in (
     "letter_write",
     "letter_lock_update",
     "letter_read",
+    "diary_write",
+    "diary_read",
     "feel",
     "I",
 ):

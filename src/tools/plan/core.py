@@ -278,7 +278,10 @@ async def letter_write(
     ai_name: Optional[str] = "",
     lock_type: Optional[str] = "none",
     unlock_date: Optional[str] = "",
+    *,
+    kind: str = "letter",
 ) -> str:
+    is_diary = kind == "diary"
     if user_name is None:
         user_name = ""
     if title is None:
@@ -354,7 +357,7 @@ async def letter_write(
 
     bucket_id = await rt.bucket_mgr.create(
         content=content.strip(),
-        tags=["__letter__"],
+        tags=["__letter__", "__diary__"] if is_diary else ["__letter__"],
         importance=10,
         domain=["letter"],
         valence=0.5,
@@ -374,6 +377,8 @@ async def letter_write(
         rt.logger.warning(f"letter_write update meta failed: {e}")
     # 注意：bucket_mgr.create() 已在 content 落盘后投递 embedding outbox
     # 向量，这里不需要也不应该重复调用 generate_and_store。
+    if is_diary:
+        return f"📔diary→{bucket_id} [{a}]"
     if normalized_lock != "none":
         lock_suffix = f" 🔒{normalized_lock}"
         if normalized_unlock:
@@ -449,7 +454,10 @@ async def letter_read(
     author: Optional[str] = "",
     date_from: Optional[str] = "",
     date_to: Optional[str] = "",
+    *,
+    kind: str = "",
 ) -> str:
+    is_diary = kind == "diary"
     if query is None:
         query = ""
     if limit is None:
@@ -489,6 +497,8 @@ async def letter_read(
         normalized_letters.append(bucket)
         states[bucket["id"]] = state
     letters = normalized_letters
+    if is_diary:
+        letters = [b for b in letters if "__diary__" in (b["metadata"].get("tags") or [])]
     visible_letters = [b for b in letters if not states[b["id"]]["locked"]]
     af = author.strip()
     if af:
@@ -571,7 +581,7 @@ async def letter_read(
 
     letters = letters[:limit]
     if not letters:
-        return "没有找到匹配的信件。"
+        return "还没有日记。" if is_diary else "没有找到匹配的信件。"
     parts = []
     for b in letters:
         m = b["metadata"]
@@ -595,4 +605,5 @@ async def letter_read(
             + strip_wikilinks(b["content"])
         )
         parts.append(payload)
-    return "=== 信件 ===\n" + "\n\n---\n\n".join(parts)
+    header = "=== 日记 ===\n" if is_diary else "=== 信件 ===\n"
+    return header + "\n\n---\n\n".join(parts)

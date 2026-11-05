@@ -41,6 +41,8 @@ EXPECTED_PUBLIC_MCP_TOOLS = (
     "letter_write",
     "letter_lock_update",
     "letter_read",
+    "diary_write",
+    "diary_read",
     "feel",
     "I",
 )

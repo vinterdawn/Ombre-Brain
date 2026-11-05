@@ -38,6 +38,8 @@ EXPECTED_TOOLS = {
     "letter_write",
     "letter_lock_update",
     "letter_read",
+    "diary_write",
+    "diary_read",
     "feel",
     "I",
     "dream",
@@ -57,6 +59,8 @@ EXPECTED_TOOL_ORDER = (
     "letter_write",
     "letter_lock_update",
     "letter_read",
+    "diary_write",
+    "diary_read",
     "feel",
     "I",
 )
@@ -158,6 +162,8 @@ EXPECTED_TOOL_PROPERTIES = {
     },
     "letter_lock_update": {"letter_id", "lock_type", "unlock_date"},
     "letter_read": {"query", "limit", "author", "date_from", "date_to"},
+    "diary_write": {"content", "title", "date", "ai_name"},
+    "diary_read": {"query", "limit", "date_from", "date_to"},
     "feel": {"query", "max_tokens"},
     # supersedes：3.6.6 的「声明取代即挂起旧条目」。
     "I": {"content", "aspect", "read", "limit", "promote", "supersedes"},

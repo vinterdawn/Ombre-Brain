@@ -104,6 +104,8 @@ class PublicToolDesignContract:
                 "letter_write": "letter",
                 "letter_read": "letter",
                 "letter_lock_update": "letter",
+                "diary_write": "letter",
+                "diary_read": "letter",
             },
             engineering_public_aliases={
                 "remember": "hold/grow",
