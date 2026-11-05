@@ -5498,7 +5498,8 @@ function buildFilters() {
   }).join('') + visibleDomains.map(function(d) {
     var key = 'domain:' + d;
     var active = key === currentFilter;
-    return '<button class="filter-btn ' + (active ? 'active' : '') + '" aria-pressed="' + (active ? 'true' : 'false') + '" data-filter="' + escAttr(key) + '">' + esc(d) + '</button>';
+    var label = d === 'letter' ? '信与日记' : d;
+    return '<button class="filter-btn ' + (active ? 'active' : '') + '" aria-pressed="' + (active ? 'true' : 'false') + '" data-filter="' + escAttr(key) + '">' + esc(label) + '</button>';
   }).join('');
 
   // buildFilters 会在每次数据刷新后运行；覆盖处理器，避免重复累积监听器。
@@ -5640,7 +5641,7 @@ function _paintBuckets() {
     var inlineStyle = b.dont_surface ? 'opacity:0.45;' : '';
     var rowClick = 'onclick="showDetail(this.dataset.id)"';
     var domainHtml = (b.domain || []).length
-      ? '<span class="domain-pill">' + esc((b.domain || []).join(', ')) + '</span>'
+      ? '<span class="domain-pill">' + esc((b.domain || []).map(function(d) { return d === 'letter' ? ((b.tags || []).indexOf('__diary__') >= 0 ? '日记' : '信') : d; }).join(', ')) + '</span>'
       : '';
     var emotionHtml = '<span class="emotion" style="display:inline-flex;align-items:center;gap:3px;"><span class="v-bar"><span class="v-dot" style="left:' + vPos + '%"></span></span>' + modelV + '</span>';
     return '<div class="' + rowCls + '" data-id="' + escAttr(b.id) + '" ' + rowClick + ' style="cursor:pointer;' + inlineStyle + '">' +
